@@ -9,6 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.sampleposui.data.invoiceList
 import com.example.sampleposui.pages.MainScreen
 import com.example.sampleposui.ui.theme.SamplePOSUITheme
 

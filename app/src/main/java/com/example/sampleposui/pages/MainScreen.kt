@@ -8,15 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sampleposui.R
-import com.example.sampleposui.data.MenuItems
-import com.example.sampleposui.data.MenuUIOptions
-import com.example.sampleposui.data.allMenuItems
-import com.example.sampleposui.data.invoieList
+import com.example.sampleposui.data.*
 import com.example.sampleposui.states.MainScreenViewModel
-import com.example.sampleposui.ui.theme.SamplePOSUITheme
 
 @Composable
 fun MainScreen(mainScreenViewModel: MainScreenViewModel = viewModel()) {
@@ -26,6 +21,7 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel = viewModel()) {
     val mainScreenUIState by mainScreenViewModel.uiState.collectAsState()
     val items = allMenuItems
     val context = LocalContext.current
+    val invoices = invoiceList
     Column {
         MyAppBar(
             onIconClick = { expanded = !expanded },
@@ -33,16 +29,25 @@ fun MainScreen(mainScreenViewModel: MainScreenViewModel = viewModel()) {
             closeDropDown = { expanded = false },
             onClickDropDown = {
                 expanded = false
-                if(it.isActive){
+                if (it.isActive) {
                     mainScreenViewModel.onMenuItemSelectChanged(it)
-                }else{
-                    Toast.makeText(context,"This ${it.title} feature is coming soon",Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "This ${it.title} feature is coming soon",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             },
             items = items,
             title = mainScreenUIState.stateName,
         )
-        MyBody(menuUIOptions = mainScreenUIState.currentOption)
+        MyBody(
+            menuUIOptions = mainScreenUIState.currentOption,
+            invoices,
+            mainScreenViewModel.totalQty(invoices),
+            mainScreenViewModel.totalAmount(invoices),
+        )
     }
 }
 
@@ -52,8 +57,8 @@ fun MyAppBar(
     expanded: Boolean,
     closeDropDown: () -> Unit,
     onClickDropDown: (item: MenuItems) -> Unit,
-    items:List<MenuItems>,
-    title:String
+    items: List<MenuItems>,
+    title: String
 ) {
     TopAppBar {
         Row(
@@ -91,23 +96,26 @@ fun MyAppBar(
 }
 
 @Composable
-fun MyBody( menuUIOptions: MenuUIOptions) {
-    if (menuUIOptions==MenuUIOptions.PURCHASE){
-        PurchaseList(itemList = invoieList)
-    }else{
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().fillMaxHeight().fillMaxWidth()) {
+fun MyBody(
+    menuUIOptions: MenuUIOptions,
+    invoices: List<Invoice>,
+    totalQty: Int,
+    totalAmount: Double,
+) {
+    if (menuUIOptions == MenuUIOptions.PURCHASE) {
+        PurchaseList(itemList = invoices, totalQty, totalAmount)
+    } else {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxHeight()
+                .fillMaxWidth()
+        ) {
             Text(text = "Welcome To Sample POS")
 
         }
     }
 
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    SamplePOSUITheme {
-        MainScreen()
-    }
 }
